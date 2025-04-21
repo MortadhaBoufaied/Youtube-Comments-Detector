@@ -1,12 +1,24 @@
 /// services/toxicity_service.dart
 class ToxicityService {
-  Future<List<String>> fetchToxicComments() async {
-    // ⚠️ Remplacer ce bloc avec une vraie analyse NLP (ML Kit, Perspective API, etc.)
+  Future<List<Map<String, String>>> fetchToxicComments() async {
+    // Simulate a network call with structured data
     await Future.delayed(Duration(seconds: 2));
     return [
-      "Ce contenu est nul !",
-      "Tu es vraiment idiot.",
-      "Quel commentaire détestable."
+      {
+        'text': 'Ce contenu est nul !',
+        'author': 'UtilisateurFâché',
+        'time': '1h ago'
+      },
+      {
+        'text': 'Tu es vraiment idiot.',
+        'author': 'Anonyme77',
+        'time': '3h ago'
+      },
+      {
+        'text': 'Quel commentaire détestable.',
+        'author': 'HaterPro',
+        'time': '1d ago'
+      },
     ];
   }
 }

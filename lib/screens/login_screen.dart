@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'video_list_screen.dart';
@@ -70,28 +71,44 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text(
                     'YTOX',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       color: Colors.red.shade700,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.red.shade200,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "By continuing, you agree to our terms of service and allow YTOX to monitor your YouTube comments for toxic or abusive language.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       color: Colors.red.shade900,
                       fontSize: 14,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.red.shade200,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade400,
+                      elevation: 10,
+                      shadowColor: Colors.red.shade200,
                       padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     icon: _isLoading
@@ -108,9 +125,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 24,
                       width: 24,
                     ),
-                    label: const Text(
+                    label: Text(
                       'Sign in with Google',
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     onPressed: _isLoading
                         ? null
@@ -119,10 +140,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         _isLoading = true;
                       });
 
+                      await Future.delayed(const Duration(milliseconds: 600)); // simulate auth
+
                       if (mounted) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => VideoListScreen()),
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => VideoListScreen(), // your target screen
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1.0, 0.0); // Slide from right
+                              const end = Offset.zero;
+                              const curve = Curves.ease;
+
+                              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                              final offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                          ),
                         );
                       }
 
@@ -131,6 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       });
                     },
                   ),
+
                 ],
               ),
             ),

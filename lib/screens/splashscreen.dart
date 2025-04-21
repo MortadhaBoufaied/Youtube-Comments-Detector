@@ -1,5 +1,6 @@
 /// screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:toxic_comments_detector_youtube/screens/login_screen.dart';
 import '../services/auth_service.dart';
@@ -31,7 +32,22 @@ class _SplachScreenState extends State<SplachScreen>
     Future.delayed(const Duration(seconds: 10), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(), // your target screen
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0); // Slide from right
+            const end = Offset.zero;
+            const curve = Curves.ease;
+
+            final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            final offsetAnimation = animation.drive(tween);
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+        ),
       );
     });
   }
@@ -53,23 +69,45 @@ class _SplachScreenState extends State<SplachScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-
-                  padding:  EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12), // Capsule-like shape
+                    gradient: LinearGradient(
+                      colors: [Colors.red.shade400, Colors.red.shade900],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.shade900.withOpacity(0.5),
+                        offset: Offset(4, 4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.2),
+                        offset: Offset(-2, -2),
+                        blurRadius: 6,
+                      ),
+                    ],
                   ),
-                  child: const Text(
+                  child: Text(
                     'YTOX',
-                    style: TextStyle(
-
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
+                      shadows: [
+                        const Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 4,
+                          color: Colors.black26,
+                        ),
+                      ],
                     ),
                   ),
                 ),
+
               ],
             ),
             const SizedBox(height: 20),
@@ -78,13 +116,35 @@ class _SplachScreenState extends State<SplachScreen>
               child: AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
-                  return LinearProgressIndicator(
-                    value: _animation.value,
-                    backgroundColor: Colors.red.shade100,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                  return Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.shade200.withOpacity(0.5),
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                      gradient: LinearGradient(
+                        colors: [Colors.red.shade100, Colors.red.shade300],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: _animation.value,
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.red.shade600),
+                      ),
+                    ),
                   );
                 },
               ),
+
             ),
           ],
         ),
