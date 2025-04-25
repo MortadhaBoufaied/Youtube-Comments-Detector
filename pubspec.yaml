@@ -30,15 +30,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_sign_in: ^6.3.0
-  google_fonts: ^6.1.0
+  google_sign_in:
+  google_fonts:
+  shared_preferences:
+  flutter_local_notifications: ^19.1.0
+  flutter_cache_manager: ^3.3.1
+  sqflite:
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+  path_provider: ^2.1.2
   http:
-  provider: ^6.1.1
-  flutter_dotenv: ^5.1.0
-  permission_handler: ^11.3.0
-  font_awesome_flutter: ^10.6.0
+  provider:
+  flutter_dotenv:
+  permission_handler:
+  font_awesome_flutter:
   sign_in_button: ^3.0.0
   connectivity_plus: ^5.0.2
+  in_app_review: ^2.0.10
+  share_plus: ^7.2.1
+  url_launcher: ^6.2.5
+  youtube_player_flutter: ^9.1.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -52,8 +64,18 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-
   uses-material-design: true
+  generate: true
   assets:
+    - assets/
     - assets/credentials.json
     - assets/images/no_connection.png
+    - assets/lang/en.json
+    - assets/lang/ar.json
+    - assets/lang/fr.json
+    - assets/lang/zh.json
+localization:
+  arb-dir: lib/l10n
+  template-arb-file: intl_en.arb
+  output-localization-file: app_localizations.dart
+

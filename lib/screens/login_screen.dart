@@ -5,7 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'video_list_screen.dart';
+import '../services/localization_service.dart'; // Make sure this is imported
+
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -58,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final screenSize = MediaQuery.of(context).size;
+    final t = AppLocalizations.of(context).translate;
 
     return Scaffold(
       body: Stack(
@@ -70,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'YTOX',
+                    t('app_title'),
                     style: GoogleFonts.poppins(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
@@ -79,14 +84,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         Shadow(
                           blurRadius: 4,
                           color: Colors.red.shade200,
-                          offset: Offset(2, 2),
+                          offset: const Offset(2, 2),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "By continuing, you agree to our terms of service and allow YTOX to monitor your YouTube comments for toxic or abusive language.",
+                    t('login_agreement'),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       color: Colors.red.shade900,
@@ -95,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Shadow(
                           blurRadius: 4,
                           color: Colors.red.shade200,
-                          offset: Offset(2, 2),
+                          offset: const Offset(2, 2),
                         ),
                       ],
                     ),
@@ -126,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 24,
                     ),
                     label: Text(
-                      'Sign in with Google',
+                      t('sign_in_with_google'),
                       style: GoogleFonts.inter(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -140,15 +145,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         _isLoading = true;
                       });
 
-                      await Future.delayed(const Duration(milliseconds: 600)); // simulate auth
+                      await Future.delayed(const Duration(milliseconds: 600));
 
                       if (mounted) {
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => VideoListScreen(), // your target screen
+                            pageBuilder: (context, animation, secondaryAnimation) => const VideoListScreen(),
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              const begin = Offset(1.0, 0.0); // Slide from right
+                              const begin = Offset(1.0, 0.0);
                               const end = Offset.zero;
                               const curve = Curves.ease;
 
@@ -169,7 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       });
                     },
                   ),
-
                 ],
               ),
             ),

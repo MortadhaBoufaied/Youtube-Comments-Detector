@@ -2,7 +2,7 @@
 class ToxicityService {
   Future<List<Map<String, String>>> fetchToxicComments() async {
     // Simulate a network call with structured data
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     return [
       {
         'text': 'Ce contenu est nul !',

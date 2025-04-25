@@ -1,5 +1,5 @@
 /// services/auth_service.dart
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService extends ChangeNotifier {
@@ -16,10 +16,14 @@ class AuthService extends ChangeNotifier {
     try {
       final result = await _googleSignIn.signIn();
       _user = result;
-      print("User signed in: $_user");
+      if (kDebugMode) {
+        print("User signed in: $_user");
+      }
       notifyListeners();
     } catch (e) {
-      print('Login error: $e');
+      if (kDebugMode) {
+        print('Login error: $e');
+      }
     }
   }
 

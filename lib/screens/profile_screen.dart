@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:toxic_comments_detector_youtube/screens/profile_screens/about_screen.dart';
+import 'package:toxic_comments_detector_youtube/screens/profile_screens/general_screen.dart';
 import 'package:toxic_comments_detector_youtube/screens/toxic_alerts_screen.dart';
 import '../services/auth_service.dart';
-import '../services/toxicity_service.dart';
+import '../services/localization_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -26,7 +28,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70), // Slightly larger for spacing
         child: AppBar(
-          backgroundColor: Colors.white,
           elevation: 4,
           shadowColor: Colors.black.withOpacity(0.15), // Soft shadow
 
@@ -45,14 +46,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       IconButton(
                         icon: const FaIcon(
                           FontAwesomeIcons.solidBell,
-                          color: Colors.black,
                           size: 26,
                         ),
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => ToxicAlertsScreen()),
+                                builder: (_) => const ToxicAlertsScreen()),
                           );
                         },
                       ),
@@ -67,8 +67,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: 40,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.account_circle,
-                                  size: 32, color: Colors.black);
+                              return const FaIcon(Icons.account_circle_outlined,
+                                  size: 32,);
                             },
                           ),
                         ),
@@ -81,39 +81,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
 
           title: Text(
-            'Account',
+            AppLocalizations.of(context).translate('account'),
             style: GoogleFonts.poppins(
-              color: Colors.black,
               fontSize: 20,
             ),
           ),
         ),
       ),
       body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
           ListTile(
-            leading: Icon(Icons.settings, color: Colors.black),
-            title: Text("General", style: GoogleFonts.poppins()),
+            leading: const FaIcon(Icons.settings_rounded),
+            title: Text(AppLocalizations.of(context).translate('general'), style: GoogleFonts.poppins()),
             onTap: () {
-              // TODO: Navigate to General settings
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const GeneralScreen(), // your target screen
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // Slide from right
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
 
-            },
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.info_outline, color: Colors.black),
-            title: Text("About", style: GoogleFonts.poppins()),
-            onTap: () {
-              // TODO: Navigate to About screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("About tapped")),
+                    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                    final offsetAnimation = animation.drive(tween);
+
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
               );
             },
           ),
-          Divider(),
+          const SizedBox(height: 10),
           ListTile(
-            leading: Icon(Icons.logout, color: Colors.redAccent),
-            title: Text("Sign Out",
+            leading: const FaIcon(Icons.info_outline_rounded),
+            title: Text(AppLocalizations.of(context).translate('about'), style: GoogleFonts.poppins()),
+            onTap: () {
+
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const AboutScreen(), // your target screen
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // Slide from right
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+
+                    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                    final offsetAnimation = animation.drive(tween);
+
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            leading: const FaIcon(Icons.logout_rounded),
+            title: Text(AppLocalizations.of(context).translate('sign_out'),
                 style: GoogleFonts.poppins(color: Colors.redAccent)),
             onTap: () async {
               final auth = Provider.of<AuthService>(context, listen: false);
@@ -122,7 +155,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
-          Divider(),
         ],
       ),
     );

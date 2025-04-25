@@ -1,15 +1,18 @@
-/// screens/video_list_screen.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
-import '../services/youtube_service.dart';
-import 'toxic_alerts_screen.dart';
+import 'package:toxic_comments_detector_youtube/screens/profile_screen.dart';
+import 'package:toxic_comments_detector_youtube/screens/toxic_alerts_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
+import '../services/auth_service.dart';
+import '../services/localization_service.dart';
+import 'video_detail_screen.dart'; // Import localization service
 
 class VideoListScreen extends StatefulWidget {
+  const VideoListScreen({super.key});
+
   @override
   _VideoListScreenState createState() => _VideoListScreenState();
 }
@@ -23,6 +26,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
       'channelTitle': 'Flutter Academy',
       'publishedAt': '2024-04-15',
       'commentCount': '12345',
+      'videoUrl': 'https://www.youtube.com/watch?v=fq4N0hgOWzU',
     },
     {
       'id': 'd4e5f6',
@@ -31,6 +35,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
       'channelTitle': 'CodeSimplify',
       'publishedAt': '2024-03-28',
       'commentCount': '8765',
+      'videoUrl': 'https://www.youtube.com/watch?v=dEj9CkB3gRw', // Placeholder
     },
     {
       'id': 'g7h8i9',
@@ -39,8 +44,10 @@ class _VideoListScreenState extends State<VideoListScreen> {
       'channelTitle': 'Design With Flutter',
       'publishedAt': '2024-02-10',
       'commentCount': '4567',
+      'videoUrl': 'https://www.youtube.com/watch?v=x0uinJvhNxI',
     },
   ];
+
 
   bool _loading = true;
   bool _hasError = false;
@@ -59,9 +66,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
       });
 
       final connectivityResult = await Connectivity().checkConnectivity();
-
       if (connectivityResult == ConnectivityResult.none) {
-        // No internet
         setState(() {
           _hasError = true;
           _loading = false;
@@ -69,14 +74,13 @@ class _VideoListScreenState extends State<VideoListScreen> {
         return;
       }
 
-
-
       setState(() {
-
         _loading = false;
       });
     } catch (e) {
-      print("❌ Error: $e");
+      if (kDebugMode) {
+        print("❌ Error: $e");
+      }
       setState(() {
         _hasError = true;
         _loading = false;
@@ -86,72 +90,63 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context).translate;
+
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70), // Slightly larger for spacing
+        preferredSize: const Size.fromHeight(70),
         child: AppBar(
-          backgroundColor: Colors.white,
           elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.15), // Soft shadow
+          shadowColor: Colors.black.withOpacity(0.15),
           automaticallyImplyLeading: false,
           leadingWidth: 110,
-          toolbarHeight: 65, // More precise height
-
+          toolbarHeight: 65,
           actions: [
             Builder(
               builder: (context) {
                 final auth = Provider.of<AuthService>(context, listen: false);
                 final photoUrl = auth.user?.photoUrl;
                 return Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const FaIcon(
-                          FontAwesomeIcons.bell,
-                          color: Colors.black,
-                          size: 26,
-                        ),
+                        icon: const FaIcon(FontAwesomeIcons.bell, size: 26),
                         onPressed: () {
                           Navigator.push(
                             context,
                             PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) => ToxicAlertsScreen(), // your target screen
+                              pageBuilder: (context, animation, secondaryAnimation) => const ToxicAlertsScreen(),
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                const begin = Offset(1.0, 0.0); // Slide from right
+                                const begin = Offset(1.0, 0.0);
                                 const end = Offset.zero;
                                 const curve = Curves.ease;
-
                                 final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
                                 final offsetAnimation = animation.drive(tween);
-
-                                return SlideTransition(
-                                  position: offsetAnimation,
-                                  child: child,
-                                );
+                                return SlideTransition(position: offsetAnimation, child: child);
                               },
                             ),
                           );
                         },
-
                       ),
                       const SizedBox(width: 10),
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          if (value == 'logout') {
-                            auth.signOut();
-                          }
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => const ProfileScreen(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.ease;
+                                final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                final offsetAnimation = animation.drive(tween);
+                                return SlideTransition(position: offsetAnimation, child: child);
+                              },
+                            ),
+                          );
                         },
-                        itemBuilder: (BuildContext context) => [
-                          const PopupMenuItem(
-                            value: 'profile',
-                            child: Text('Profile'),
-                          ),
-                          const PopupMenuItem(
-                            value: 'logout',
-                            child: Text('Logout'),
-                          ),
-                        ],
                         child: CircleAvatar(
                           radius: 20,
                           backgroundColor: Colors.transparent,
@@ -162,7 +157,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                               height: 40,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.account_circle, size: 32, color: Colors.black);
+                                return const FaIcon(Icons.account_circle, size: 32);
                               },
                             ),
                           ),
@@ -174,7 +169,6 @@ class _VideoListScreenState extends State<VideoListScreen> {
               },
             ),
           ],
-
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -204,42 +198,30 @@ class _VideoListScreenState extends State<VideoListScreen> {
           ),
         ),
       ),
-
-
-
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Colors.red,))
+          ? const Center(child: CircularProgressIndicator(color: Colors.red))
           : _hasError
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/no_connection.png',
-              width: 120,
-              height: 120,
-            ),
+            Image.asset('assets/images/no_connection.png', width: 120, height: 120),
             const SizedBox(height: 20),
             Text(
-              'No internet connection',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                color: Colors.black54,
-              ),
+              t('no_connection'),
+              style: GoogleFonts.inter(fontSize: 18, color: Colors.black54),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: fetchVideos,
-              icon: const Icon(FontAwesomeIcons.refresh,color: Colors.white,),
-              label: Text('Retry',style: GoogleFonts.inter(color: Colors.white),),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade400,
-              ),
+              icon: const Icon(FontAwesomeIcons.arrowsRotate, color: Colors.white),
+              label: Text(t('retry'), style: GoogleFonts.inter(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade400),
             ),
           ],
         ),
       )
-      :ListView.builder(
+          : ListView.builder(
         itemCount: _videos.length,
         itemBuilder: (context, index) {
           final video = _videos[index];
@@ -249,13 +231,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.1),
                     blurRadius: 6,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -272,21 +253,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 ),
                 title: Text(
                   video['title'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    '${video['commentCount']} Comments • ${video['publishedAt']}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade600,
-                    ),
+                    '${video['commentCount']} ${t('comments')} • ${video['publishedAt']}',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                 ),
                 trailing: Column(
@@ -316,16 +291,31 @@ class _VideoListScreenState extends State<VideoListScreen> {
                   ],
                 ),
                 onTap: () {
-                  // Optional: Navigate to video details or handle tap
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) => VideoDetailScreen(video: video),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(1.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
+
+                        final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                        final offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
             ),
           );
         },
-      )
-
-
-
+      ),
     );
   }
 }

@@ -1,10 +1,8 @@
 /// screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:toxic_comments_detector_youtube/screens/login_screen.dart';
-import '../services/auth_service.dart';
-import 'video_list_screen.dart';
+
 
 class SplachScreen extends StatefulWidget {
   const SplachScreen({super.key});
@@ -33,7 +31,7 @@ class _SplachScreenState extends State<SplachScreen>
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(), // your target screen
+          pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(), // your target screen
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0); // Slide from right
             const end = Offset.zero;
@@ -69,7 +67,7 @@ class _SplachScreenState extends State<SplachScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.red.shade400, Colors.red.shade900],
@@ -80,13 +78,13 @@ class _SplachScreenState extends State<SplachScreen>
                     boxShadow: [
                       BoxShadow(
                         color: Colors.red.shade900.withOpacity(0.5),
-                        offset: Offset(4, 4),
+                        offset: const Offset(4, 4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
                       BoxShadow(
                         color: Colors.white.withOpacity(0.2),
-                        offset: Offset(-2, -2),
+                        offset: const Offset(-2, -2),
                         blurRadius: 6,
                       ),
                     ],
@@ -123,7 +121,7 @@ class _SplachScreenState extends State<SplachScreen>
                       boxShadow: [
                         BoxShadow(
                           color: Colors.red.shade200.withOpacity(0.5),
-                          offset: Offset(0, 2),
+                          offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),
                       ],

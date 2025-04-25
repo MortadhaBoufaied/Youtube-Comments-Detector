@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import '../config.dart'; // import your config
@@ -29,7 +29,9 @@ class YouTubeService {
       final data = json.decode(response.body);
       return data['items'];
     } catch (e) {
-      print('Login error: $e');
+      if (kDebugMode) {
+        print('Login error: $e');
+      }
       return [];
     }
   }
