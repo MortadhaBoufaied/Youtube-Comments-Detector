@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 class VideoDetailScreen extends StatefulWidget {
   final Map<String, dynamic> video;
@@ -11,6 +12,7 @@ class VideoDetailScreen extends StatefulWidget {
 
 class _VideoDetailScreenState extends State<VideoDetailScreen> {
   List<Map<String, dynamic>> comments = [];
+  int? translatingIndex;
 
   @override
   void initState() {
@@ -18,11 +20,49 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     _loadComments();
   }
 
+  Future<String> _translateText(String text, String targetLang) async {
+    final translator = OnDeviceTranslator(
+      sourceLanguage: TranslateLanguage.english,
+      targetLanguage: _getLanguageFromCode(targetLang),
+    );
+    final translatedText = await translator.translateText(text);
+    await translator.close();
+    return translatedText;
+  }
+
+  TranslateLanguage _getLanguageFromCode(String code) {
+    switch (code) {
+      case 'fr':
+        return TranslateLanguage.french;
+      case 'es':
+        return TranslateLanguage.spanish;
+      case 'de':
+        return TranslateLanguage.german;
+      default:
+        return TranslateLanguage.english;
+    }
+  }
+
   void _loadComments() {
     comments = [
-      {'text': 'This is so dumb!', 'toxic': true, 'userAvatar': 'https://i.pravatar.cc/150?img=1'},
-      {'text': 'Great content!', 'toxic': false, 'userAvatar': 'https://i.pravatar.cc/150?img=2'},
-      {'text': 'Worst video ever!', 'toxic': true, 'userAvatar': 'https://i.pravatar.cc/150?img=3'},
+      {
+        'text': 'This is so dumb!',
+        'originalText': 'This is so dumb!', // keep original
+        'toxic': true,
+        'userAvatar': 'https://i.pravatar.cc/150?img=1'
+      },
+      {
+        'text': 'Great content!',
+        'originalText': 'Great content!',
+        'toxic': false,
+        'userAvatar': 'https://i.pravatar.cc/150?img=2'
+      },
+      {
+        'text': 'Worst video ever!',
+        'originalText': 'Worst video ever!',
+        'toxic': true,
+        'userAvatar': 'https://i.pravatar.cc/150?img=3'
+      },
     ];
     setState(() {});
   }
@@ -34,8 +74,48 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   }
 
   void _minimizeVideoAndGoBack() {
-    // You can use Navigator.pop here and trigger floating player outside this screen
     Navigator.pop(context, widget.video);
+  }
+
+  void _showLanguagePicker(int index) async {
+    String? chosen = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Translate to French'),
+              onTap: () => Navigator.pop(context, 'fr'),
+            ),
+            ListTile(
+              title: const Text('Translate to Spanish'),
+              onTap: () => Navigator.pop(context, 'es'),
+            ),
+            ListTile(
+              title: const Text('Translate to German'),
+              onTap: () => Navigator.pop(context, 'de'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (chosen != null) {
+      setState(() {
+        translatingIndex = index;
+      });
+
+      final translatedText = await _translateText(
+        comments[index]['originalText'], // always translate the ORIGINAL text
+        chosen,
+      );
+
+      setState(() {
+        comments[index]['text'] = translatedText;
+        translatingIndex = null;
+      });
+    }
   }
 
   @override
@@ -45,10 +125,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 25,),
+          const SizedBox(height: 25),
           Stack(
             children: [
-
               ClipRRect(
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(10),
@@ -86,9 +165,24 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     backgroundImage: NetworkImage(comment['userAvatar']),
                   ),
                   title: Text(comment['text']),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.grey),
-                    onPressed: () => _deleteComment(index),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      translatingIndex == index
+                          ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                          : IconButton(
+                        icon: const Icon(Icons.translate, color: Colors.blueAccent),
+                        onPressed: () => _showLanguagePicker(index),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.grey),
+                        onPressed: () => _deleteComment(index),
+                      ),
+                    ],
                   ),
                 );
               },
